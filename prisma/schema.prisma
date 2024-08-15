@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // For local development, you can uncomment the code below:
+  // provider = "mysql"
+  // url      = env("DATABASE_URL")
+
+  // Or, to connect to a production database, you can uncomment this:
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_NON_POOLING")
+}
+
+model Jabatan {
+  id        String   @id @default(uuid())
+  nama      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User[]
+}
+
+model User {
+  id            String   @id @default(uuid())
+  fingerPrintId String?
+  tapCardId     String?
+  faceId        String?
+  nama          String
+  jabatanId     String
+  jenisKelamin  String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  jabatan       Jabatan  @relation(fields: [jabatanId], references: [id])
+  akses         Akses[]
+}
+
+model Akses {
+  id           String    @id @default(uuid())
+  userId       String
+  tempatMasuk  String
+  tempatKeluar String?
+  metodeMasuk  String
+  metodeKeluar String?
+  waktuMasuk   DateTime
+  waktuKeluar  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
